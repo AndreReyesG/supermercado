@@ -1,0 +1,19 @@
+{{define "base"}}
+<!doctype html>
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <title>{{template "title" .}} - Supermercado</title>
+    </head>
+    <body>
+        <header>
+            <h1><a href='/'>Supermercado</a></h1>
+        </header>
+        {{template "nav" .}}
+        <main>
+            {{template "main" .}}
+        </main>
+        <footer>Hecho por André Reyes</footer>
+    </body>
+</html>
+{{end}}
