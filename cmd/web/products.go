@@ -1,52 +1,112 @@
-// TODO: Caching templates.
+// NOTE: The newTemplateCache() function only work with files in the
+// products directory.
 package main
 
 import (
+	"errors"
 	"fmt"
-	"html/template"
 	"net/http"
+	"strconv"
+
+	"github.com/AndreReyesG/supermercado/internal/data"
 )
 
-func (app *application) listProducts(w http.ResponseWriter, r *http.Request) {
-	files := []string{
-		"./ui/html/base.html",
-		"./ui/html/partials/nav.html",
-		"./ui/html/pages/products/list.html",
-	}
-
-	tmpl, err := template.ParseFiles(files...)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("problem loading template %s", err.Error()), http.StatusInternalServerError)
+func (app *application) showProduct(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
 		return
 	}
 
-	tmpl.ExecuteTemplate(w, "base", nil)
+	product, err := app.products.Get(id)
+	if err != nil {
+		if errors.Is(err, data.ErrRecordNotFound) {
+			http.NotFound(w, r)
+		} else {
+			http.Error(w, fmt.Sprintf("problem getting the product %s", err.Error()), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	data := templateData{
+		Product: product,
+	}
+
+	app.render(w, r, http.StatusOK, "show.html", data)
+}
+
+func (app *application) listProducts(w http.ResponseWriter, r *http.Request) {
+	products, err := app.products.GetAll()
+	if err != nil {
+		http.Error(w, fmt.Sprintf("problem getting products %s", err.Error()), http.StatusInternalServerError)
+		return
+	}
+
+	data := templateData{
+		Products: products,
+	}
+
+	app.render(w, r, http.StatusOK, "list.html", data)
 }
 
 func (app *application) showCreateProduct(w http.ResponseWriter, r *http.Request) {
-	// GET /product/new
-	fmt.Fprint(w, "Mostrar formulario para dar de alta algun producto")
+	// GET /products/new
+	page := "new.html"
+	tmpl, ok := app.templateCache[page]
+	if !ok {
+		err := fmt.Errorf("the template %s does not exits", page)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	tmpl.ExecuteTemplate(w, "base", nil)
 }
 
 func (app *application) createProduct(w http.ResponseWriter, r *http.Request) {
-	// POST /product
-	fmt.Fprint(w, "Procesar formulario")
-}
-
-func (app *application) showAssignDepartment(w http.ResponseWriter, r *http.Request) {
-	// GET /products/{id}/assign-department
-	files := []string{
-		"./ui/html/base.html",
-		"./ui/html/partials/nav.html",
-		"./ui/html/pages/products/assign_department.html",
-	}
-
-	tmpl, err := template.ParseFiles(files...)
+	// POST /products
+	err := r.ParseForm()
 	if err != nil {
-		http.Error(w, fmt.Sprintf("problem loading template %s", err.Error()), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("problem calling r.ParseForm, %s", err.Error()), http.StatusBadRequest)
+		return
+	}
+	name := r.PostForm.Get("name")
+	supplier := r.PostForm.Get("supplier")
+
+	id, err := app.products.Insert(name, supplier)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("problem inserting product %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 
+	http.Redirect(w, r, fmt.Sprintf("/products/%d", id), http.StatusSeeOther)
+}
+
+func (app *application) deleteProduct(w http.ResponseWriter, r *http.Request) {
+	// POST /products/{id}/delete
+	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
+		return
+	}
+
+	err = app.products.Delete(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/products", http.StatusSeeOther)
+}
+
+// TODO: The render() method must be accept nil values?
+func (app *application) showAssignDepartment(w http.ResponseWriter, r *http.Request) {
+	// GET /products/{id}/assign-department
+	page := "assign_department.html"
+	tmpl, ok := app.templateCache[page]
+	if !ok {
+		err := fmt.Errorf("the template %s does not exits", page)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	tmpl.ExecuteTemplate(w, "base", nil)
 }
 

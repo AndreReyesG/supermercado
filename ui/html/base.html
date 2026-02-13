@@ -10,6 +10,9 @@
             <h1><a href='/'>Supermercado</a></h1>
         </header>
         {{template "nav" .}}
+
+        {{block "aside" .}}
+        {{end}}
         <main>
             {{template "main" .}}
         </main>

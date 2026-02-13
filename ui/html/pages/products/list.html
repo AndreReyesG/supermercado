@@ -1,5 +1,37 @@
 {{define "title"}}Productos{{end}}
 
+{{define "aside"}}
+<aside>
+    <ul>
+        <li><a href='/products/new'>Agregar Producto</a></li>
+    </ul>
+</aside>
+{{end}}
+
 {{define "main"}}
-<p>Listar todos los productos.</p>
+    <h2>Productos</h2>
+    {{if .Products}}
+    <table>
+        <tr>
+            <th>Nombre</th>
+            <th>Proveedor</th>
+            <th>ID</th>
+            <th>Eliminar Producto</th>
+        </tr>
+        {{range .Products}}
+        <tr>
+            <td><a href='/products/{{.ID}}'>{{.Name}}</a></td>
+            <td>{{.Supplier}}</td>
+            <td>{{.ID}}</td>
+            <td>
+                <form action='/products/{{.ID}}/delete' method='POST'>
+                    <button type='submit'>Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {{end}}
+    </table>
+    {{else}}
+        <p>No hay productos registrados.</p>
+    {{end}}
 {{end}}

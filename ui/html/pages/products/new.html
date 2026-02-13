@@ -1,0 +1,11 @@
+{{define "title"}}Agregar Producto{{end}}
+
+{{define "main"}}
+<form action='/products' method='POST'>
+    <label>Nombre</label>
+    <input type='text' name='name'>
+    <label>Proveedor</label>
+    <input type='text' name='supplier'>
+    <input type='submit' value='Agregar producto'>
+</form>
+{{end}}
