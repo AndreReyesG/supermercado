@@ -5,32 +5,87 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strconv"
 )
 
-func (app *application) listDepartments(w http.ResponseWriter, r *http.Request) {
-	files := []string{
-		"./ui/html/base.html",
-		"./ui/html/partials/nav.html",
-		"./ui/html/pages/departments/list.html",
-	}
-
-	tmpl, err := template.ParseFiles(files...)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("problem loading template %s", err.Error()), http.StatusInternalServerError)
+func (app *application) showDepartment(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
 		return
 	}
 
-	tmpl.ExecuteTemplate(w, "base", nil)
+	// TODO: 404 Not Found
+	department, err := app.departments.Get(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := templateData{
+		Department: department,
+	}
+
+	page := "show.html"
+	tmpl, ok := app.deptTmplCache[page]
+	if !ok {
+		err := fmt.Errorf("the template %s does not exits", page)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	tmpl.ExecuteTemplate(w, "base", data)
+}
+
+func (app *application) listDepartments(w http.ResponseWriter, r *http.Request) {
+	departments, err := app.departments.GetAll()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := templateData{
+		Departments: departments,
+	}
+
+	page := "list.html"
+	tmpl, ok := app.deptTmplCache[page]
+	if !ok {
+		err := fmt.Errorf("the template %s does not exits", page)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	tmpl.ExecuteTemplate(w, "base", data)
 }
 
 func (app *application) showCreateDepartment(w http.ResponseWriter, r *http.Request) {
 	// GET /departments/new
-	fmt.Fprint(w, "Mostrar formulario para dar de alta un depto")
+	page := "new.html"
+	tmpl, ok := app.deptTmplCache[page]
+	if !ok {
+		err := fmt.Errorf("the template %s does not exits", page)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	tmpl.ExecuteTemplate(w, "base", nil)
 }
 
 func (app *application) createDepartment(w http.ResponseWriter, r *http.Request) {
 	// POST /departments
-	fmt.Fprint(w, "Procesar formulario para dar de alta un depto")
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, fmt.Sprintf("problem calling r.ParseForm, %s", err.Error()), http.StatusBadRequest)
+		return
+	}
+	name := r.PostForm.Get("name")
+	manager := r.PostForm.Get("manager")
+
+	id, err := app.departments.Insert(name, manager)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("problem inserting product %s", err.Error()), http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/departments/%d", id), http.StatusSeeOther)
 }
 
 func (app *application) showDepartmentPrices(w http.ResponseWriter, r *http.Request) {
@@ -48,4 +103,21 @@ func (app *application) showDepartmentPrices(w http.ResponseWriter, r *http.Requ
 	}
 
 	tmpl.ExecuteTemplate(w, "base", nil)
+}
+
+func (app *application) deleteDepartment(w http.ResponseWriter, r *http.Request) {
+	// POST /departments/{id}/delete
+	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
+		return
+	}
+
+	err = app.departments.Delete(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/departments", http.StatusSeeOther)
 }

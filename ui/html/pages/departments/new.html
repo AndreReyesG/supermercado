@@ -1,0 +1,11 @@
+{{define "title"}}Agregar Departamento{{end}}
+
+{{define "main"}}
+<form action='/departments' method='POST'>
+    <label>Nombre</label>
+    <input type='text' name='name'>
+    <label>Responsable</label>
+    <input type='text' name='manager'>
+    <input type='submit' value='Agregar producto'>
+</form>
+{{end}}

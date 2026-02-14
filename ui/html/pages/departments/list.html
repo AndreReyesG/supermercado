@@ -1,5 +1,37 @@
 {{define "title"}}Departamentos{{end}}
 
+{{define "aside"}}
+<aside>
+    <ul>
+        <li><a href='/departments/new'>Agregar Departamento</a></li>
+    </ul>
+</aside>
+{{end}}
+
 {{define "main"}}
-<p>Listar todos los departamentos.</p>
+    <h2>Departamento</h2>
+    {{if .Departments}}
+    <table>
+        <tr>
+            <th>Nombre</th>
+            <th>Encargado</th>
+            <th>ID</th>
+            <th>Eliminar Producto</th>
+        </tr>
+        {{range .Departments}}
+        <tr>
+            <td><a href='/departments/{{.ID}}'>{{.Name}}</a></td>
+            <td>{{.Manager}}</td>
+            <td>{{.ID}}</td>
+            <td>
+                <form action='/departments/{{.ID}}/delete' method='POST'>
+                    <button type='submit'>Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {{end}}
+    </table>
+    {{else}}
+        <p>No hay departamentos registrados.</p>
+    {{end}}
 {{end}}

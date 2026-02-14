@@ -14,6 +14,10 @@ func (app *application) routes() *http.ServeMux {
 	router.HandleFunc("POST /products/{id}/delete", app.deleteProduct)
 
 	router.HandleFunc("GET /departments", app.listDepartments)
+	router.HandleFunc("GET /departments/{id}", app.showDepartment)
+	router.HandleFunc("GET /departments/new", app.showCreateDepartment)
+	router.HandleFunc("POST /departments", app.createDepartment)
+	router.HandleFunc("POST /departments/{id}/delete", app.deleteDepartment)
 
 	router.HandleFunc("GET /products/{id}/assign-department", app.showAssignDepartment)
 
