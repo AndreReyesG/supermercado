@@ -17,10 +17,15 @@ confirm:
 # DEVELOPMENT
 # ========================================================================== #
 
-## run: run the cmd/web application
-.PHONY: run
-run:
+## run/web: run the cmd/web application
+.PHONY: run/web
+run/web:
 	go run ./cmd/web
+
+## run/inject: run the cmd/examples/inject code
+.PHONY: run/inject
+run/inject: confirm
+	go run cmd/examples/inject/main.go
 
 ## db/mysql: connect to the database usign mysql (need password)
 .PHONY: db/mysql
@@ -41,7 +46,7 @@ db/migrations/up: confirm
 
 ## db/migrations/down: apply all down database migrations
 .PHONY: db/migrations/down
-db/migrations/down: confirm
+db/migrations/down:
 	@echo 'Running up migrations...'
 	migrate -path ./migrations -database ${SUPERMERCADO_DB_DSN} down
 
