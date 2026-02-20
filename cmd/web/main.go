@@ -28,7 +28,6 @@ type application struct {
 	departments *data.DepartmentModel
 	//models data.Models
 	templateCache map[string]*template.Template
-	deptTmplCache map[string]*template.Template
 }
 
 func main() {
@@ -57,12 +56,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	deptTmplCache, err := newDepartmentTemplateCache()
-	if err != nil {
-		logger.Error(err.Error())
-		os.Exit(1)
-	}
-
 	app := &application{
 		config:      cfg,
 		logger:      logger,
@@ -70,7 +63,6 @@ func main() {
 		departments: &data.DepartmentModel{DB: db},
 		//models: data.NewModels(db),
 		templateCache: templateCache,
-		deptTmplCache: deptTmplCache,
 	}
 
 	logger.Info("starting server", "addr", fmt.Sprintf(":%d", cfg.port))

@@ -1,5 +1,3 @@
-// NOTE: The newTemplateCache() function only work with files in the
-// products directory.
 package main
 
 import (
@@ -32,7 +30,7 @@ func (app *application) showProduct(w http.ResponseWriter, r *http.Request) {
 		Product: product,
 	}
 
-	app.render(w, r, http.StatusOK, "show.html", data)
+	app.render(w, r, http.StatusOK, "products/show.html", data)
 }
 
 func (app *application) listProducts(w http.ResponseWriter, r *http.Request) {
@@ -46,19 +44,12 @@ func (app *application) listProducts(w http.ResponseWriter, r *http.Request) {
 		Products: products,
 	}
 
-	app.render(w, r, http.StatusOK, "list.html", data)
+	app.render(w, r, http.StatusOK, "products/list.html", data)
 }
 
 func (app *application) showCreateProduct(w http.ResponseWriter, r *http.Request) {
 	// GET /products/new
-	page := "new.html"
-	tmpl, ok := app.templateCache[page]
-	if !ok {
-		err := fmt.Errorf("the template %s does not exits", page)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	tmpl.ExecuteTemplate(w, "base", nil)
+	app.render(w, r, http.StatusOK, "products/new.html", nil)
 }
 
 func (app *application) createProduct(w http.ResponseWriter, r *http.Request) {
@@ -97,17 +88,9 @@ func (app *application) deleteProduct(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/products", http.StatusSeeOther)
 }
 
-// TODO: The render() method must be accept nil values?
 func (app *application) showAssignDepartment(w http.ResponseWriter, r *http.Request) {
 	// GET /products/{id}/assign-department
-	page := "assign_department.html"
-	tmpl, ok := app.templateCache[page]
-	if !ok {
-		err := fmt.Errorf("the template %s does not exits", page)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	tmpl.ExecuteTemplate(w, "base", nil)
+	app.render(w, r, http.StatusOK, "products/assign_department.html", nil)
 }
 
 func (app *application) assignDepartment(w http.ResponseWriter, r *http.Request) {

@@ -1,9 +1,7 @@
-// TODO: Caching templates.
 package main
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
 )
@@ -26,14 +24,7 @@ func (app *application) showDepartment(w http.ResponseWriter, r *http.Request) {
 		Department: department,
 	}
 
-	page := "show.html"
-	tmpl, ok := app.deptTmplCache[page]
-	if !ok {
-		err := fmt.Errorf("the template %s does not exits", page)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	tmpl.ExecuteTemplate(w, "base", data)
+	app.render(w, r, http.StatusOK, "departments/show.html", data)
 }
 
 func (app *application) listDepartments(w http.ResponseWriter, r *http.Request) {
@@ -47,26 +38,12 @@ func (app *application) listDepartments(w http.ResponseWriter, r *http.Request) 
 		Departments: departments,
 	}
 
-	page := "list.html"
-	tmpl, ok := app.deptTmplCache[page]
-	if !ok {
-		err := fmt.Errorf("the template %s does not exits", page)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	tmpl.ExecuteTemplate(w, "base", data)
+	app.render(w, r, http.StatusOK, "departments/list.html", data)
 }
 
 func (app *application) showCreateDepartment(w http.ResponseWriter, r *http.Request) {
 	// GET /departments/new
-	page := "new.html"
-	tmpl, ok := app.deptTmplCache[page]
-	if !ok {
-		err := fmt.Errorf("the template %s does not exits", page)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	tmpl.ExecuteTemplate(w, "base", nil)
+	app.render(w, r, http.StatusOK, "departments/new.html", nil)
 }
 
 func (app *application) createDepartment(w http.ResponseWriter, r *http.Request) {
@@ -90,19 +67,7 @@ func (app *application) createDepartment(w http.ResponseWriter, r *http.Request)
 
 func (app *application) showDepartmentPrices(w http.ResponseWriter, r *http.Request) {
 	// GET /departments/{id}/prices
-	files := []string{
-		"./ui/html/base.html",
-		"./ui/html/partials/nav.html",
-		"./ui/html/pages/departments/prices.html",
-	}
-
-	tmpl, err := template.ParseFiles(files...)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("problem loading template %s", err.Error()), http.StatusInternalServerError)
-		return
-	}
-
-	tmpl.ExecuteTemplate(w, "base", nil)
+	app.render(w, r, http.StatusOK, "departments/prices.html", nil)
 }
 
 func (app *application) deleteDepartment(w http.ResponseWriter, r *http.Request) {
