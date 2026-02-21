@@ -2,6 +2,7 @@ package data
 
 import (
 	"database/sql"
+	"errors"
 )
 
 type Department struct {
@@ -41,9 +42,12 @@ func (d *DepartmentModel) Get(id int64) (Department, error) {
 	var department Department
 
 	err := row.Scan(&department.ID, &department.Name, &department.Manager)
-	// TODO: Better error handling.
 	if err != nil {
-		return Department{}, nil
+		if errors.Is(err, sql.ErrNoRows) {
+			return Department{}, ErrRecordNotFound
+		} else {
+			return Department{}, err
+		}
 	}
 
 	return department, nil

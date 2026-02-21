@@ -15,7 +15,7 @@ type ProductModel struct {
 	DB *sql.DB
 }
 
-func (p *ProductModel) Insert(name, supplier string) (int, error) {
+func (p *ProductModel) Insert(name, supplier string) (int64, error) {
 	query := `
         INSERT INTO products (name, supplier) 
         VALUES (?, ?)`
@@ -30,10 +30,10 @@ func (p *ProductModel) Insert(name, supplier string) (int, error) {
 		return 0, err
 	}
 
-	return int(id), nil
+	return id, nil
 }
 
-func (p *ProductModel) Get(id int) (Product, error) {
+func (p *ProductModel) Get(id int64) (Product, error) {
 	query := `
 		SELECT id, name, supplier FROM products
     	WHERE id = ?`
