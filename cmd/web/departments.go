@@ -1,9 +1,12 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/AndreReyesG/supermercado/internal/data"
 )
 
 func (app *application) showDepartment(w http.ResponseWriter, r *http.Request) {
@@ -13,10 +16,13 @@ func (app *application) showDepartment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: 404 Not Found
 	department, err := app.departments.Get(id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if errors.Is(err, data.ErrRecordNotFound) {
+			http.NotFound(w, r)
+		} else {
+			http.Error(w, fmt.Sprintf("problem getting department %s", err.Error()), http.StatusInternalServerError)
+		}
 		return
 	}
 

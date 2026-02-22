@@ -85,3 +85,23 @@ func (p *ProductModel) GetAll() ([]Product, error) {
 
 	return products, nil
 }
+
+func (p *ProductModel) AssignDepartment(productID, departmentID int64) error {
+	query := `
+		UPDATE products
+		SET department_id = ?
+		WHERE id = ?
+	`
+	_, err := p.DB.Exec(query, productID, departmentID)
+	return err
+}
+
+func (p *ProductModel) RemoveDepartment(productID int64) error {
+	query := `
+		UPDATE products
+		SET department_id = NULL
+		WHERE id = ?
+	`
+	_, err := p.DB.Exec(query, productID)
+	return err
+}

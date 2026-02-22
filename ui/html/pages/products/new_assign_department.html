@@ -1,0 +1,34 @@
+{{define "title"}}Agregar Producto a un Depto.{{end}}
+
+{{define "main"}}
+<form action='/products/assign-department' method='POST'>
+    <fieldset>
+        <legend>Agregar producto a un departamento</legend>
+        <label for='product_id'>Producto:</label><br>
+        {{if .Products}}
+        <select id='product_id' name='product_id'>
+            {{range .Products}}
+            <option value='{{.ID}}'>{{.Name}}</option>
+            {{end}}
+        </select>
+        {{else}}
+        <p>No hay productos registrados.</p>
+        {{end}}
+        <br>
+        <br>
+        <label for='department_id'>Departamento</label><br>
+        {{if .Departments}}
+        <select id='department_id' name='department_id'>
+            {{range .Departments}}
+            <option value='{{.ID}}'>{{.Name}}</option>
+            {{end}}
+        </select>
+        {{else}}
+        <p>No hay departamentos registrados.</p>
+        {{end}}
+        <br>
+        <br>
+        <input type='submit' value='Agregar'>
+    </fieldset>
+</form>
+{{end}}

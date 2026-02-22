@@ -1,0 +1,23 @@
+{{define "title"}}Eliminar Producto a un Depto.{{end}}
+
+{{define "main"}}
+<form action='/products/assign-department/delete' method='POST'>
+    <fieldset>
+        <legend>Eliminar producto de un departamento</legend>
+        <label for='product_id'>Producto:</label><br>
+        {{if .Products}}
+        <select id='product_id' name='product_id'>
+            {{range .Products}}
+            <option value='{{.ID}}'>{{.Name}}</option>
+            {{end}}
+        </select>
+        {{else}}
+        <p>No hay productos registrados.</p>
+        {{end}}
+        <br>
+        <br>
+        <input type='submit' value='Eliminar del Departamento'>
+    </fieldset>
+</form>
+{{end}}
+

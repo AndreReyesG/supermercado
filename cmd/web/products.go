@@ -10,7 +10,7 @@ import (
 )
 
 func (app *application) showProduct(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.PathValue("id"))
+	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil || id < 1 {
 		http.NotFound(w, r)
 		return
@@ -86,16 +86,6 @@ func (app *application) deleteProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/products", http.StatusSeeOther)
-}
-
-func (app *application) showAssignDepartment(w http.ResponseWriter, r *http.Request) {
-	// GET /products/{id}/assign-department
-	app.render(w, r, http.StatusOK, "products/assign_department.html", nil)
-}
-
-func (app *application) assignDepartment(w http.ResponseWriter, r *http.Request) {
-	// POST /products/{id}/assign-department
-	fmt.Fprint(w, "Procesar formulario para dar de alta un prod a un depto")
 }
 
 func (app *application) showAddPrice(w http.ResponseWriter, r *http.Request) {
