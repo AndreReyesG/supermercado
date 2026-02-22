@@ -92,7 +92,7 @@ func (p *ProductModel) AssignDepartment(productID, departmentID int64) error {
 		SET department_id = ?
 		WHERE id = ?
 	`
-	_, err := p.DB.Exec(query, productID, departmentID)
+	_, err := p.DB.Exec(query, departmentID, productID)
 	return err
 }
 
