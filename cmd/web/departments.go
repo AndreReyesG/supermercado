@@ -71,11 +71,6 @@ func (app *application) createDepartment(w http.ResponseWriter, r *http.Request)
 	http.Redirect(w, r, fmt.Sprintf("/departments/%d", id), http.StatusSeeOther)
 }
 
-func (app *application) showDepartmentPrices(w http.ResponseWriter, r *http.Request) {
-	// GET /departments/{id}/prices
-	app.render(w, r, http.StatusOK, "departments/prices.html", nil)
-}
-
 func (app *application) deleteDepartment(w http.ResponseWriter, r *http.Request) {
 	// POST /departments/{id}/delete
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
@@ -91,4 +86,8 @@ func (app *application) deleteDepartment(w http.ResponseWriter, r *http.Request)
 	}
 
 	http.Redirect(w, r, "/departments", http.StatusSeeOther)
+}
+
+func (app *application) departmentNotFound(w http.ResponseWriter, r *http.Request) {
+	app.render(w, r, http.StatusOK, "departments/not_found.html", nil)
 }

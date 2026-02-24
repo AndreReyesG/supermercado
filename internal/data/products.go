@@ -6,9 +6,11 @@ import (
 )
 
 type Product struct {
-	ID       int64
-	Name     string
-	Supplier string
+	ID           int64
+	Name         string
+	Supplier     string
+	DepartmentID *int64
+	Price        *float64
 }
 
 type ProductModel struct {
@@ -35,14 +37,20 @@ func (p *ProductModel) Insert(name, supplier string) (int64, error) {
 
 func (p *ProductModel) Get(id int64) (Product, error) {
 	query := `
-		SELECT id, name, supplier FROM products
+		SELECT id, name, supplier, department_id, price FROM products
     	WHERE id = ?`
 
 	row := p.DB.QueryRow(query, id)
 
 	var product Product
 
-	err := row.Scan(&product.ID, &product.Name, &product.Supplier)
+	err := row.Scan(
+		&product.ID,
+		&product.Name,
+		&product.Supplier,
+		&product.DepartmentID,
+		&product.Price,
+	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return Product{}, ErrRecordNotFound
@@ -103,5 +111,15 @@ func (p *ProductModel) RemoveDepartment(productID int64) error {
 		WHERE id = ?
 	`
 	_, err := p.DB.Exec(query, productID)
+	return err
+}
+
+func (p *ProductModel) AssignPrice(productID int64, price float64) error {
+	query := `
+		UPDATE products
+		SET price = ?
+		WHERE id = ?
+	`
+	_, err := p.DB.Exec(query, price, productID)
 	return err
 }

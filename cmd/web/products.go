@@ -88,12 +88,14 @@ func (app *application) deleteProduct(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/products", http.StatusSeeOther)
 }
 
-func (app *application) showAddPrice(w http.ResponseWriter, r *http.Request) {
-	// GET /products/{id}/prices/new
-	fmt.Fprint(w, "Formulario para asignar precio a un producto")
+func (app *application) productNotFound(w http.ResponseWriter, r *http.Request) {
+	app.render(w, r, http.StatusOK, "products/not_found.html", nil)
 }
 
-func (app *application) addPrice(w http.ResponseWriter, r *http.Request) {
-	// POST /products/{id}/prices
-	fmt.Fprint(w, "Procesar formulario para asignar un precio a un prod")
+func (app *application) productNoDept(w http.ResponseWriter, r *http.Request) {
+	app.render(w, r, http.StatusOK, "products/no_dept.html", nil)
+}
+
+func (app *application) productNoInDept(w http.ResponseWriter, r *http.Request) {
+	app.render(w, r, http.StatusOK, "products/no_in_dept.html", nil)
 }

@@ -13,6 +13,9 @@ func (app *application) routes() *http.ServeMux {
 	router.HandleFunc("GET /products/new", app.showCreateProduct)
 	router.HandleFunc("POST /products", app.createProduct)
 	router.HandleFunc("POST /products/{id}/delete", app.deleteProduct)
+	router.HandleFunc("GET /products/not-found", app.productNotFound)
+	router.HandleFunc("GET /products/no-dept", app.productNoDept)
+	router.HandleFunc("GET /products/no-in-dept", app.productNoInDept)
 
 	// Departments
 	router.HandleFunc("GET /departments", app.listDepartments)
@@ -20,6 +23,7 @@ func (app *application) routes() *http.ServeMux {
 	router.HandleFunc("GET /departments/new", app.showCreateDepartment)
 	router.HandleFunc("POST /departments", app.createDepartment)
 	router.HandleFunc("POST /departments/{id}/delete", app.deleteDepartment)
+	router.HandleFunc("GET /departments/not-found", app.departmentNotFound)
 
 	// Assigments
 	router.HandleFunc("GET /products/assign-department", app.showAssignDepartment)
@@ -30,7 +34,9 @@ func (app *application) routes() *http.ServeMux {
 	router.HandleFunc("GET /departments/products", app.listProdsByDepartment)
 
 	// Prices
-	router.HandleFunc("GET /departments/{id}/prices", app.showDepartmentPrices)
+	router.HandleFunc("GET /prices", app.showDepartmentPrices)
+	router.HandleFunc("GET /assign-price", app.assignPriceForm)
+	router.HandleFunc("POST /assign-price", app.assignPrice)
 
 	return router
 }
