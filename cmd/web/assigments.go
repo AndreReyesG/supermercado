@@ -93,3 +93,15 @@ func (app *application) removeDepartment(w http.ResponseWriter, r *http.Request)
 
 	http.Redirect(w, r, "/products", http.StatusSeeOther)
 }
+
+func (app *application) listProdsByDepartment(w http.ResponseWriter, r *http.Request) {
+	departments, err := app.departments.GetDepartmentsWithProducts()
+	if err != nil {
+		http.Error(w, "Unable to fetch data", http.StatusInternalServerError)
+		return
+	}
+	data := templateData{
+		Departments: departments,
+	}
+	app.render(w, r, http.StatusOK, "departments/products.html", data)
+}

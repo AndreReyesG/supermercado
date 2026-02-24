@@ -1,0 +1,33 @@
+{{define "title"}}Productos por Departamentos{{end}}
+
+{{define "main"}}
+    <h2>Productos por Departamentos</h2>
+    {{if .Departments}}
+        <ul>
+            {{range .Departments}}
+            <li>
+                <h4>
+                    <a href='/departments/{{.ID}}' style='text-decoration: none;'>
+                        {{.Name}} ID: {{.ID}}
+                    </a>
+                    {{if .Products}}
+                    <ul>
+                        {{range .Products}}
+                        <li>
+                            <a href='/products/{{.ID}}' style='text-decoration: none;'>
+                                {{.Name}} ID: {{.ID}}
+                            </a>
+                        </li>
+                        {{end}}
+                    </ul>
+                    {{else}}
+                    <p>No hay productos en este departamento.</p>
+                    {{end}}
+                </h4>
+            </li>
+            {{end}}
+        </ul>
+    {{else}}
+        <p>No hay nada que ver.</p>
+    {{end}}
+{{end}}

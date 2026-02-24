@@ -6,9 +6,10 @@ import (
 )
 
 type Department struct {
-	ID      int64
-	Name    string
-	Manager string
+	ID       int64
+	Name     string
+	Manager  string
+	Products []Product
 }
 
 type DepartmentModel struct {
@@ -84,4 +85,61 @@ func (d *DepartmentModel) Delete(id int64) error {
 	query := `DELETE FROM departments WHERE id = ?`
 	_, err := d.DB.Exec(query, id)
 	return err
+}
+
+func (d *DepartmentModel) GetDepartmentsWithProducts() ([]Department, error) {
+	query := `SELECT 
+    d.id AS department_id,
+    d.name AS department_name,
+    p.id AS product_id,
+    p.name AS product_name
+FROM departments d
+LEFT JOIN products p 
+    ON p.department_id = d.id
+ORDER BY d.id`
+	rows, err := d.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	departmentsMap := make(map[int64]*Department)
+
+	for rows.Next() {
+		var deptID int64
+		var deptName string
+		var productID sql.NullInt64
+		var productName sql.NullString
+
+		err := rows.Scan(&deptID, &deptName,
+			&productID, &productName)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, exists := departmentsMap[deptID]; !exists {
+			departmentsMap[deptID] = &Department{
+				ID:       deptID,
+				Name:     deptName,
+				Products: []Product{},
+			}
+		}
+
+		if productID.Valid {
+			departmentsMap[deptID].Products = append(
+				departmentsMap[deptID].Products,
+				Product{
+					ID:   productID.Int64,
+					Name: productName.String,
+				},
+			)
+		}
+	}
+
+	var result []Department
+	for _, dept := range departmentsMap {
+		result = append(result, *dept)
+	}
+
+	return result, nil
 }
