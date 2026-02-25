@@ -1,0 +1,24 @@
+{{define "title"}}Consultar Precio{{end}}
+
+<!-- TODO: Hacer un 'partial' con este aside. -->
+{{define "aside"}}
+<aside>
+    <ul>
+        <li><a href='/assign-price'>Asignar un precio a un producto</a></li>
+        <li><a href='/search-price'>Consultar precios de los productos de un departamento</a></li>
+    </ul>
+</aside>
+{{end}}
+
+{{define "main"}}
+<h2>Consultar Precios Por Departamento</h2>
+<form action='/search-price' method='POST'>
+    <fieldset>
+        <legend>Ingresa el ID de Departamento</legend>
+        <label for='department_id'>ID del Departamento</label><br>
+        <input type='text' id='department_id' name='department_id'><br>
+        <br>
+        <input type='submit' value='Consultar Precios'>
+    </fieldset>
+</form>
+{{end}}

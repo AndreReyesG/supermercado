@@ -1,0 +1,26 @@
+{{define "title"}}Precios Dept. #{{.Department.ID}}{{end}}
+
+<!-- TODO: Hacer un 'partial' con este aside. -->
+{{define "aside"}}
+<aside>
+    <ul>
+        <li><a href='/assign-price'>Asignar un precio a un producto</a></li>
+        <li><a href='/search-price'>Consultar precios de los productos de un departamento</a></li>
+    </ul>
+</aside>
+{{end}}
+
+{{define "main"}}
+
+<h2>Precios de {{.Department.Name}}</h2>
+{{if .Department.Products}}
+<ul>
+    {{range .Department.Products}}
+    <li><a href='/products/{{.ID}}'>{{.Name}} - ${{.Price}}</a></li>
+    {{end}}
+</ul>
+{{else}}
+<p>No hay productos en este departamento.</p>
+{{end}}
+
+{{end}}

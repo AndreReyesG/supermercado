@@ -37,6 +37,9 @@ func (app *application) routes() *http.ServeMux {
 	router.HandleFunc("GET /prices", app.showDepartmentPrices)
 	router.HandleFunc("GET /assign-price", app.assignPriceForm)
 	router.HandleFunc("POST /assign-price", app.assignPrice)
+	router.HandleFunc("GET /search-price", app.searchPriceForm)
+	router.HandleFunc("POST /search-price", app.searchPrice)
+	router.HandleFunc("GET /departments/{id}/prices", app.listDeptPrices)
 
 	return router
 }

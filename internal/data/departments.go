@@ -143,3 +143,59 @@ ORDER BY d.id`
 
 	return result, nil
 }
+
+func (d *DepartmentModel) GetDeptWithProducts(id int64) (Department, error) {
+	query := `
+        SELECT d.id, d.name, d.manager, p.id, p.name, p.supplier, p.price 
+        FROM departments as d
+		LEFT JOIN products as p
+		ON d.id = p.department_id
+		WHERE d.id=?`
+	rows, err := d.DB.Query(query, id)
+	if err != nil {
+		return Department{}, nil
+	}
+	defer rows.Close()
+
+	var department Department
+
+	for rows.Next() {
+		var d Department
+		var p Product
+		var productID *int64
+		var productName *string
+		var productSupplier *string
+		var productPrice *float64
+
+		err := rows.Scan(
+			&d.ID,
+			&d.Name,
+			&d.Manager,
+			&productID,
+			&productName,
+			&productSupplier,
+			&productPrice,
+		)
+		if err != nil {
+			return Department{}, nil
+		}
+
+		department.ID = d.ID
+		department.Name = d.Name
+		department.Manager = d.Manager
+		if productID != nil {
+			p.ID = *productID
+			p.Name = *productName
+			p.Supplier = *productSupplier
+			p.Price = productPrice
+			p.DepartmentID = &d.ID
+			department.Products = append(department.Products, p)
+		}
+	}
+
+	if err = rows.Err(); err != nil {
+		return Department{}, err
+	}
+
+	return department, nil
+}
